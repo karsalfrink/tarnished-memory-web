@@ -4,42 +4,37 @@
 </head>
 <body>
   <script src="https://cdn.jsdelivr.net/particle-api-js/5/particle.min.js"></script>
-  <!-- <script src="local.settings.json"></script> -->
-
   <script>
     var particle = new Particle();
 
     fetch("local.settings.json")
     .then(
-      (response) => { 
+      (response) => {
+        console.log('Fetch local settings')
         return response.json() 
       })
     .then(
       (json) => {
+        console.log('Log in to Particle')
         return particle.login({username: json.username, password: json.password});
-      })
-    // .then(json => console.log(json.username));
-    
+      })    
     .then(
       (data) => {
+        console.log('Get event stream')
         var token = data.body.access_token;
-        console.log('Logged in.');
         return particle.getEventStream({ deviceID: '2d0041000a47373336323231', name: 'deviceCount', auth: token });
-      },
-      (error) => {
-        console.log('Error logging in', error);
       })
     .then(
       (stream) => {
-        console.log('Getting stream…');
+        console.log('Listen for events');
         stream.on('event', function(event) {
           console.log("Event: ", event.data);
         });
-      },
-      (error) => {
-        console.log('Error getting stream', error);
-
       })
-    </script>
+    .catch(
+      (error) => {
+        console.log('Error', error);
+      })
+  </script>
 </body>
 </html>
